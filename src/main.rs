@@ -23,7 +23,8 @@ impl fmt::Display for Commit {
 }
 
 fn main() {
-    // let args = Args::parse();
+    let args: Vec<String> = std::env::args().collect();
+    let sermon = args.iter().any(|a| a == "sermon");
     let date = chrono::Local::now().format("%Y-%m-%d").to_string();
 
     let repo = match gix::discover(".") {
@@ -89,15 +90,20 @@ fn main() {
             Clear(ClearType::All),
             MoveTo(0, 0)
         );
-        let commit_selected =
-            MultiSelect::new("Select commit to comment:", commits.clone()).prompt();
-        let done = match commit_selected {
-            Ok(a) => a,
-            Err(_) => {
-                let _ = execute!(stdout(), LeaveAlternateScreen);
-                return;
-            }
-        };
+        let done;
+        if sermon {
+            done = commits.clone();
+        } else {
+            let commit_selected =
+                MultiSelect::new("Select commit to comment:", commits.clone()).prompt();
+            done = match commit_selected {
+                Ok(a) => a,
+                Err(_) => {
+                    let _ = execute!(stdout(), LeaveAlternateScreen);
+                    return;
+                }
+            };
+        }
         let trash_prompt = Confirm::new("Do you want to trash these commit ?")
             .with_default(false)
             .prompt();
@@ -146,6 +152,9 @@ fn main() {
         }
         commits.retain(|c| !done.iter().any(|d| d.id == c.id));
         let _ = execute!(stdout(), LeaveAlternateScreen);
+        if sermon {
+            return;
+        }
     }
 }
 
