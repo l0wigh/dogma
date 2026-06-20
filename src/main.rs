@@ -100,7 +100,7 @@ fn main() {
                 Ok(a) => a,
                 Err(_) => {
                     let _ = execute!(stdout(), LeaveAlternateScreen);
-                    return;
+                    break;
                 }
             };
         }
@@ -118,12 +118,24 @@ fn main() {
                 let version_prompt = Text::new("Version:").prompt();
                 let version = match version_prompt {
                     Ok(v) => v,
-                    Err(_) => continue,
+                    Err(_) => {
+                        if sermon {
+                            break;
+                        } else {
+                            continue;
+                        }
+                    }
                 };
                 let comment_prompt = Text::new("Comments:").prompt();
                 let comment = match comment_prompt {
                     Ok(c) => c,
-                    Err(_) => continue,
+                    Err(_) => {
+                        if sermon {
+                            break;
+                        } else {
+                            continue;
+                        }
+                    }
                 };
                 new.push_str(format!("## [{}] - {}\n\n", version, date).as_str());
                 new.push_str(format!("  - {}\n", comment).as_str());
@@ -148,12 +160,18 @@ fn main() {
                     Err(e) => println!("Error while writing the changelog: {:?}", e),
                 }
             }
-            Err(_) => continue,
+            Err(_) => {
+                if sermon {
+                    break;
+                } else {
+                    continue;
+                }
+            }
         }
         commits.retain(|c| !done.iter().any(|d| d.id == c.id));
         let _ = execute!(stdout(), LeaveAlternateScreen);
         if sermon {
-            return;
+            break;
         }
     }
 }
