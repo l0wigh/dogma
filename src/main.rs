@@ -70,10 +70,9 @@ fn main() {
     }
     commit_vec.reverse();
 
-    let old = fs::read_to_string("CHANGELOG.md").unwrap_or_default();
-    let mut new = String::new();
-
     loop {
+        let old = fs::read_to_string("CHANGELOG.md").unwrap_or_default();
+        let mut new = String::new();
         let _ = execute!(
             stdout(),
             EnterAlternateScreen,
@@ -85,11 +84,6 @@ fn main() {
             Ok(a) => a,
             Err(_) => {
                 let _ = execute!(stdout(), LeaveAlternateScreen);
-                new.push_str(old.as_str());
-                match fs::write("CHANGELOG.md", new) {
-                    Ok(_) => return,
-                    Err(e) => println!("Error while writing the changelog: {:?}", e),
-                }
                 return;
             }
         };
@@ -109,6 +103,11 @@ fn main() {
             new.push_str(format!("    - {}\n", elem).as_str());
         }
         new.push_str("\n\n");
+        new.push_str(old.as_str());
+        match fs::write("CHANGELOG.md", new) {
+            Ok(_) => return,
+            Err(e) => println!("Error while writing the changelog: {:?}", e),
+        }
         commit_vec.retain(|x| !done.contains(x));
         let _ = execute!(stdout(), LeaveAlternateScreen);
     }
