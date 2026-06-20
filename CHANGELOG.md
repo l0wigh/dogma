@@ -1,3 +1,10 @@
+## [0.4.2] - 2026-06-20
+
+  - Fixing sermon to not loop forever, adding a little print on screen just because :)
+    - [ada79d0](https://github.com/l0wigh/dogma/commit/ada79d07c724b1f4bdb60b5e87e9d83f5e832670) (fix): Fixed sermon 
+    - [96a54ee](https://github.com/l0wigh/dogma/commit/96a54ee79463e9e3c8af33015ca56409c4bf0150) (update): Adding some fun on screen 
+    - [f236cb9](https://github.com/l0wigh/dogma/commit/f236cb988856eb4d48d84e4601d959a04cd964b8) (update): version in Cargo.toml 
+
 ## [0.4.0] - 2026-06-20
 
   - Feeling tired of hand selecting all the commits you've just done ? Use the sermon command ! This will get all the commits and let you trash, version, comment them all in one go !
