@@ -15,4 +15,4 @@ Just run `cargo install --git https://github.com/L0Wigh/dogma`
 
 ## Does it work ?
 
-Look at it in [action](https://github.com/L0Wigh/dogma/)
+Look at it in [action](https://github.com/l0wigh/dogma/blob/master/CHANGELOG.md)
