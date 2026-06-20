@@ -1,3 +1,8 @@
+## [0.3.0] - 2026-06-20
+
+  - You can now trash unecessary commits ! So when you update the README.md or something, just trash them on the next dogma usage !
+    - [d0648a9](https://github.com/l0wigh/dogma/commit/d0648a9c07ad5ebbc8258cee46e1d073228cf1c2) (new): Adding a prompt to let the user trash commits 
+
 ## [0.2.0] - 2026-06-20
 
   - Now storing link to commit when the repo is on github, gitlab, bitbucket. Should look into other git server
