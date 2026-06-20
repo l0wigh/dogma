@@ -1,4 +1,3 @@
-use clap::Parser;
 use crossterm::cursor::MoveTo;
 use crossterm::execute;
 use crossterm::terminal::{Clear, ClearType, EnterAlternateScreen, LeaveAlternateScreen};
@@ -10,20 +9,6 @@ use std::io::Write;
 use std::io::stdout;
 use std::process::Command;
 use std::{fmt, fs};
-
-#[derive(Parser)]
-#[command(
-    name = "dogma",
-    version,
-    about = "Generate changelogs based on the commits"
-)]
-struct Args {
-    #[arg(long)]
-    from: Option<String>,
-
-    #[arg(long, default_value = "HEAD")]
-    to: String,
-}
 
 #[derive(Clone)]
 struct Commit {

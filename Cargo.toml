@@ -1,3 +1,4 @@
+
 [package]
 name = "dogma"
 version = "0.3.0"
@@ -5,7 +6,6 @@ edition = "2024"
 
 [dependencies]
 chrono = "0.4.45"
-clap = { version = "4.6.1", features = ["derive"] }
 crossterm = "0.29.0"
 gix = "0.84.0"
 inquire = "0.9.4"
