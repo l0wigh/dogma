@@ -13,6 +13,8 @@ Just run `cargo install --git https://github.com/L0Wigh/dogma`
 - Press `enter`, say if you want to trash the commits, give a version of the app, then the comment.
 - Repeat this action until all the commits are commented or just press `escape` to leave dogma.
 
+Dogma will only be able to add links to commit if the repo have a distant origin. So make sure to set it up before using dogma if it's a requirement for you !
+
 ## Does it work ?
 
 Look at it in [action](https://github.com/l0wigh/dogma/blob/master/CHANGELOG.md)
