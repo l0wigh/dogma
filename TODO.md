@@ -1,5 +1,0 @@
-- Add a way to extract everything into CHANGELOG.md
-- Add a way to check what was already extracted to update the changelog without adding old stuff
-- Add a way to comment changelog blocks
-	- this could be done by selecting a range of commits
-	- with this you can then put a comment on the block
