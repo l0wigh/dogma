@@ -1,5 +1,6 @@
 use crossterm::cursor::MoveTo;
 use crossterm::execute;
+use crossterm::style::Stylize;
 use crossterm::terminal::{Clear, ClearType, EnterAlternateScreen, LeaveAlternateScreen};
 use gix::bstr::ByteSlice;
 use inquire::{Confirm, MultiSelect, Text};
@@ -81,6 +82,10 @@ fn main() {
     commits.retain(|c| !already_done.contains(&c.id));
     let git_url = remote_base_url();
 
+    if commits.len() == 0 {
+        println!("No more commits to comments");
+    }
+
     loop {
         let old = fs::read_to_string("CHANGELOG.md").unwrap_or_default();
         let mut new = String::new();
@@ -90,6 +95,7 @@ fn main() {
             Clear(ClearType::All),
             MoveTo(0, 0)
         );
+        println!("{}", "Dogma - preach your releases".magenta().bold());
         let done;
         if sermon {
             done = commits.clone();
@@ -103,6 +109,9 @@ fn main() {
                     break;
                 }
             };
+            if done.len() == 0 {
+                continue;
+            }
         }
         let trash_prompt = Confirm::new("Do you want to trash these commit ?")
             .with_default(false)
@@ -169,11 +178,12 @@ fn main() {
             }
         }
         commits.retain(|c| !done.iter().any(|d| d.id == c.id));
-        let _ = execute!(stdout(), LeaveAlternateScreen);
         if sermon {
             break;
         }
+        let _ = execute!(stdout(), LeaveAlternateScreen);
     }
+    let _ = execute!(stdout(), LeaveAlternateScreen);
 }
 
 fn load_dogma() -> HashSet<String> {
