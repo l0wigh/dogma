@@ -3,7 +3,7 @@ use crossterm::cursor::MoveTo;
 use crossterm::execute;
 use crossterm::terminal::{Clear, ClearType, EnterAlternateScreen, LeaveAlternateScreen};
 use gix::bstr::ByteSlice;
-use inquire::{MultiSelect, Text};
+use inquire::{Confirm, MultiSelect, Text};
 use std::collections::HashSet;
 use std::fs::OpenOptions;
 use std::io::Write;
@@ -104,45 +104,60 @@ fn main() {
             Clear(ClearType::All),
             MoveTo(0, 0)
         );
-        let ans = MultiSelect::new("Select commit to comment:", commits.clone()).prompt();
-        let done = match ans {
+        let commit_selected =
+            MultiSelect::new("Select commit to comment:", commits.clone()).prompt();
+        let done = match commit_selected {
             Ok(a) => a,
             Err(_) => {
                 let _ = execute!(stdout(), LeaveAlternateScreen);
                 return;
             }
         };
-        let version_prompt = Text::new("Version:").prompt();
-        let version = match version_prompt {
-            Ok(v) => v,
+        let trash_prompt = Confirm::new("Do you want to trash these commit ?")
+            .with_default(false)
+            .prompt();
+        match trash_prompt {
+            Ok(true) => {
+                for elem in done.iter() {
+                    save_dogma(elem.id.clone());
+                    continue;
+                }
+            }
+            Ok(false) => {
+                let version_prompt = Text::new("Version:").prompt();
+                let version = match version_prompt {
+                    Ok(v) => v,
+                    Err(_) => continue,
+                };
+                let comment_prompt = Text::new("Comments:").prompt();
+                let comment = match comment_prompt {
+                    Ok(c) => c,
+                    Err(_) => continue,
+                };
+                new.push_str(format!("## [{}] - {}\n\n", version, date).as_str());
+                new.push_str(format!("  - {}\n", comment).as_str());
+                for elem in done.iter() {
+                    let short = &elem.id[..7.min(elem.id.len())];
+                    let line = match &git_url {
+                        Some(b) => format!(
+                            "    - [{}]({}) {}\n",
+                            short,
+                            commit_url(b, &elem.id),
+                            elem.title
+                        ),
+                        None => format!("    - {}\n", elem),
+                    };
+                    new.push_str(&line);
+                    save_dogma(elem.id.clone());
+                }
+                new.push_str("\n");
+                new.push_str(old.as_str());
+                match fs::write("CHANGELOG.md", new) {
+                    Ok(_) => (),
+                    Err(e) => println!("Error while writing the changelog: {:?}", e),
+                }
+            }
             Err(_) => continue,
-        };
-        let comment_prompt = Text::new("Comments:").prompt();
-        let comment = match comment_prompt {
-            Ok(c) => c,
-            Err(_) => continue,
-        };
-        new.push_str(format!("## [{}] - {}\n\n", version, date).as_str());
-        new.push_str(format!("  - {}\n", comment).as_str());
-        for elem in done.iter() {
-            let short = &elem.id[..7.min(elem.id.len())];
-            let line = match &git_url {
-                Some(b) => format!(
-                    "    - [{}]({}) {}\n",
-                    short,
-                    commit_url(b, &elem.id),
-                    elem.title
-                ),
-                None => format!("    - {}\n", elem),
-            };
-            new.push_str(&line);
-            save_dogma(elem.id.clone());
-        }
-        new.push_str("\n");
-        new.push_str(old.as_str());
-        match fs::write("CHANGELOG.md", new) {
-            Ok(_) => (),
-            Err(e) => println!("Error while writing the changelog: {:?}", e),
         }
         commits.retain(|c| !done.iter().any(|d| d.id == c.id));
         let _ = execute!(stdout(), LeaveAlternateScreen);
