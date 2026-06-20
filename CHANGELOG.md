@@ -1,3 +1,8 @@
+## [0.4.0] - 2026-06-20
+
+  - Feeling tired of hand selecting all the commits you've just done ? Use the sermon command ! This will get all the commits and let you trash, version, comment them all in one go !
+    - [381e2ec](https://github.com/l0wigh/dogma/commit/381e2ecaf915a7952ffd0eb82d85eb000c78f13f) (new): adding sermon command 
+
 ## [0.3.0] - 2026-06-20
 
   - You can now trash unecessary commits ! So when you update the README.md or something, just trash them on the next dogma usage !
