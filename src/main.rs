@@ -23,6 +23,7 @@ struct Args {
 
 fn main() {
     // let args = Args::parse();
+    let date = chrono::Local::now().format("%Y-%m-%d").to_string();
 
     let repo = match gix::discover(".") {
         Ok(r) => r,
@@ -92,14 +93,20 @@ fn main() {
                 return;
             }
         };
-        let comment_prompt = Text::new("Comments: ").prompt();
+        let version_prompt = Text::new("Version:").prompt();
+        let version = match version_prompt {
+            Ok(v) => v,
+            Err(_) => continue,
+        };
+        let comment_prompt = Text::new("Comments:").prompt();
         let comment = match comment_prompt {
             Ok(c) => c,
             Err(_) => continue,
         };
-        new.push_str(format!("## {}\n\n", comment).as_str());
+        new.push_str(format!("## [{}] - {}\n\n", version, date).as_str());
+        new.push_str(format!("  - {}\n", comment).as_str());
         for elem in done.iter() {
-            new.push_str(format!("  - {}\n", elem).as_str());
+            new.push_str(format!("    - {}\n", elem).as_str());
         }
         new.push_str("\n\n");
         commit_vec.retain(|x| !done.contains(x));
