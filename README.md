@@ -9,9 +9,9 @@ Just run `cargo install --git https://github.com/L0Wigh/dogma`
 ## Usage
 
 - Run `dogma` command in any git directory.
-- Select a bunch of commit that you want to comment using <space>.
-- Press <enter>, give a version of the app, then the comment.
-- Repeat this action until all the commits are commented or just press <escape> to leave dogma.
+- Select a bunch of commit that you want to comment using `space`.
+- Press `enter`, say if you want to trash the commits, give a version of the app, then the comment.
+- Repeat this action until all the commits are commented or just press `escape` to leave dogma.
 
 ## Does it work ?
 
