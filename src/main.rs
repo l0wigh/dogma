@@ -8,6 +8,7 @@ use std::collections::HashSet;
 use std::fs::OpenOptions;
 use std::io::Write;
 use std::io::stdout;
+use std::process::Command;
 use std::{fmt, fs};
 
 #[derive(Parser)]
@@ -92,6 +93,7 @@ fn main() {
 
     let already_done = load_dogma();
     commits.retain(|c| !already_done.contains(&c.id));
+    let git_url = remote_base_url();
 
     loop {
         let old = fs::read_to_string("CHANGELOG.md").unwrap_or_default();
@@ -123,7 +125,17 @@ fn main() {
         new.push_str(format!("## [{}] - {}\n\n", version, date).as_str());
         new.push_str(format!("  - {}\n", comment).as_str());
         for elem in done.iter() {
-            new.push_str(format!("    - {}\n", elem).as_str());
+            let short = &elem.id[..7.min(elem.id.len())];
+            let line = match &git_url {
+                Some(b) => format!(
+                    "    - [{}]({}) {}\n",
+                    short,
+                    commit_url(b, &elem.id),
+                    elem.title
+                ),
+                None => format!("    - {}\n", elem),
+            };
+            new.push_str(&line);
             save_dogma(elem.id.clone());
         }
         new.push_str("\n");
@@ -153,4 +165,39 @@ fn save_dogma(new: String) {
         .open(".dogma")
         .expect("Can't open .dogma");
     let _ = writeln!(f, "{}", new);
+}
+
+fn remote_base_url() -> Option<String> {
+    let out = Command::new("git")
+        .args(["remote", "get-url", "origin"])
+        .output()
+        .ok()?;
+    if !out.status.success() {
+        return None;
+    }
+    let raw = String::from_utf8_lossy(&out.stdout).trim().to_string();
+    Some(normalize_remote(&raw))
+}
+
+fn normalize_remote(raw: &str) -> String {
+    let mut url = raw.to_string();
+
+    if let Some(rest) = url.strip_prefix("git@") {
+        url = format!("https://{}", rest.replacen(':', "/", 1));
+    } else if let Some(rest) = url.strip_prefix("ssh://git@") {
+        url = format!("https://{}", rest);
+    }
+    url = url.strip_suffix(".git").unwrap_or(&url).to_string();
+    url.trim_end_matches('/').to_string()
+}
+
+fn commit_url(base: &str, hash: &str) -> String {
+    let path = if base.contains("gitlab") {
+        "/-/commit/"
+    } else if base.contains("bitbucket") {
+        "/commits/"
+    } else {
+        "/commit/"
+    };
+    format!("{}{}{}", base, path, hash)
 }
